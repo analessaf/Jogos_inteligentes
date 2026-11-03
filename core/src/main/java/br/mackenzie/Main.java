@@ -23,6 +23,7 @@ public class Main extends ApplicationAdapter {
     private SpriteBatch lote;
     private BitmapFont fonte;
     private Agente npc, jogador;
+    private Agente[] bando = new Agente[30];
     private Vector2 destino;
     private Vector2 forca = new Vector2();
     private Estado estado = Estado.EXPLORANDO;
@@ -38,6 +39,11 @@ public class Main extends ApplicationAdapter {
         npc = new Agente(200f, 210f);
         jogador = new Agente(750f, 310f);
         jogador.velocidade.setZero();
+        // 30 agentes
+        for (int i = 0; i < bando.length; i++) {
+            bando[i] = new Agente(MathUtils.random(410f, 550f), MathUtils.random(225f, 315f));
+            bando[i].maxVelocidade = 95f;
+        }
     }
 
     @Override
@@ -91,6 +97,16 @@ public class Main extends ApplicationAdapter {
         npc.mover(forca, delta);
         npc.posicao.x = MathUtils.clamp(npc.posicao.x, 24f, 936f);
         npc.posicao.y = MathUtils.clamp(npc.posicao.y, 75f, 455f);
+        // O bando
+        for (Agente a : bando) {
+            Vector2 movimento = a.flocking(bando).add(a.wander(delta).scl(0.35f));
+            if (a.posicao.x < 95f || a.posicao.x > 865f ||
+                    a.posicao.y < 145f || a.posicao.y > 385f)
+                movimento.add(a.seek(new Vector2(480f, 270f)).scl(2f));
+            a.mover(movimento, delta);
+            a.posicao.x = MathUtils.clamp(a.posicao.x, 26f, 934f);
+            a.posicao.y = MathUtils.clamp(a.posicao.y, 78f, 452f);
+        }
         desenhar();
     }
 
@@ -123,7 +139,7 @@ public class Main extends ApplicationAdapter {
         formas.setColor(0.87f, 0.89f, 0.93f, 1f);
         for (int x = 0; x <= 960; x += 48) formas.line(x, 60f, x, 478f);
         for (int y = 60; y <= 478; y += 48) formas.line(0f, y, LARGURA, y);
-.
+
         formas.setColor(0.95f, 0.48f, 0.42f, 1f);
         formas.circle(npc.posicao.x, npc.posicao.y, VISAO, 64);
         if (destino != null) {
@@ -149,6 +165,9 @@ public class Main extends ApplicationAdapter {
         formas.end();
 
         formas.begin(ShapeRenderer.ShapeType.Filled);
+        // Lilas: os 30 agentes do bando.
+        formas.setColor(0.43f, 0.37f, 0.78f, 1f);
+        for (Agente a : bando) formas.circle(a.posicao.x, a.posicao.y, 6f, 12);
         formas.setColor(0.98f, 0.40f, 0.37f, 1f); // coral
         formas.circle(npc.posicao.x, npc.posicao.y, 15f, 24);
         formas.setColor(Color.WHITE);
