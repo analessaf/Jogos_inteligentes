@@ -12,7 +12,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
-/** Atividade de IA: NPC explora sozinho, segue cliques e persegue o jogador. */
 public class Main extends ApplicationAdapter {
     private static final float LARGURA = 960f, ALTURA = 540f;
     private static final float VISAO = 175f, RAIO_ARRIVE = 105f;
@@ -59,7 +58,7 @@ public class Main extends ApplicationAdapter {
             }
         }
 
-        // FSM: a IA escolhe um comportamento automaticamente.
+        // FSM
         if (npc.posicao.dst(jogador.posicao) < VISAO) {
             estado = Estado.PERSEGUINDO;
             comportamento = "Pursuit";
@@ -78,13 +77,12 @@ public class Main extends ApplicationAdapter {
             if (distancia < 7f && npc.velocidade.len() < 22f) {
                 npc.velocidade.setZero();
                 destino = null;
-                pausa = 0.8f; // Para um instante e volta a explorar sozinho.
+                pausa = 0.8f;
             }
         } else {
             estado = Estado.EXPLORANDO;
             comportamento = "Wander";
             forca = npc.wander(delta);
-            // Evita que a exploracao deixe o NPC preso nas bordas.
             if (npc.posicao.x < 65f || npc.posicao.x > 895f ||
                     npc.posicao.y < 110f || npc.posicao.y > 435f)
                 forca = npc.seek(new Vector2(480f, 270f));
@@ -114,7 +112,6 @@ public class Main extends ApplicationAdapter {
         tela.apply();
         formas.setProjectionMatrix(tela.getCamera().combined);
 
-        // Visual diferente do exemplo: fundo claro, painel e personagens geometricos.
         formas.begin(ShapeRenderer.ShapeType.Filled);
         formas.setColor(0.12f, 0.16f, 0.28f, 1f);
         formas.rect(0f, 478f, LARGURA, 62f);
@@ -126,8 +123,7 @@ public class Main extends ApplicationAdapter {
         formas.setColor(0.87f, 0.89f, 0.93f, 1f);
         for (int x = 0; x <= 960; x += 48) formas.line(x, 60f, x, 478f);
         for (int y = 60; y <= 478; y += 48) formas.line(0f, y, LARGURA, y);
-
-        // Radar ao redor do NPC; alvo do clique; previsao da perseguicao.
+.
         formas.setColor(0.95f, 0.48f, 0.42f, 1f);
         formas.circle(npc.posicao.x, npc.posicao.y, VISAO, 64);
         if (destino != null) {
@@ -144,6 +140,7 @@ public class Main extends ApplicationAdapter {
             formas.circle(futuro.x, futuro.y, 8f, 16);
             formas.line(npc.posicao, futuro);
         }
+
         // Verde = velocidade, roxo = forca de direcao.
         formas.setColor(0.16f, 0.63f, 0.37f, 1f);
         formas.line(npc.posicao, new Vector2(npc.posicao).mulAdd(npc.velocidade, 0.32f));
@@ -152,13 +149,13 @@ public class Main extends ApplicationAdapter {
         formas.end();
 
         formas.begin(ShapeRenderer.ShapeType.Filled);
-        formas.setColor(0.98f, 0.40f, 0.37f, 1f); // NPC: coral
+        formas.setColor(0.98f, 0.40f, 0.37f, 1f); // coral
         formas.circle(npc.posicao.x, npc.posicao.y, 15f, 24);
         formas.setColor(Color.WHITE);
         Vector2 frente = new Vector2(npc.velocidade);
         if (!frente.isZero()) frente.nor().scl(6f);
         formas.circle(npc.posicao.x + frente.x, npc.posicao.y + frente.y, 4f, 12);
-        formas.setColor(0.10f, 0.65f, 0.72f, 1f); // Jogador: losango turquesa
+        formas.setColor(0.10f, 0.65f, 0.72f, 1f); // turquesa
         float x = jogador.posicao.x, y = jogador.posicao.y;
         formas.triangle(x, y + 17f, x - 15f, y, x + 15f, y);
         formas.triangle(x, y - 17f, x - 15f, y, x + 15f, y);
